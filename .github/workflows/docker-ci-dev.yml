@@ -40,6 +40,6 @@ jobs:
       - name: Build and Push Docker Image
         run: |
           docker build -t ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-itsjeck-service:${{ env.VERSION }} .
-          docker tag ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-itsjeck-service:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-service:dev
+          docker tag ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-itsjeck-service:${{ env.VERSION }} ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-itsjeck-service:dev
           docker push ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-itsjeck-service:${{ env.VERSION }}
           docker push ${{ secrets.DOCKER_USERNAME }}/api-cdt-gateway-itsjeck-service:dev
