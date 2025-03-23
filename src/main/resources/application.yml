@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: api-cdt-gateway-itsjeck-service
+  threads:
+    virtual:
+      enabled: true
+  thread-executor: virtual
+  data:
+    mongodb:
+      uri: mongodb://mongodb:27017/config_itsjeck
+
+---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+  metrics:
+    tags:
+      application: api-cdt-gateway-itsjeck-service
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: 'true'
+    export:
+      otlp:
+        enabled: true
+        url: http://localhost:4318/v1/metrics
+
+logging:
+  pattern:
+    level: "trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %p"
+  level:
+    agus.ramdan.cdt.gateway.itsjeck: DEBUG
+    agus.ramdan.cdt.base: DEBUG
+
+payment-gateway:
+  base-url: https://api.disbursement.transfez.com/api/v1
+  api-key : rahasia
+  local-transfer:
+    path: /transactions
