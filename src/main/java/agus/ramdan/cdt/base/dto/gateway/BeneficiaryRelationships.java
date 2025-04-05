@@ -17,7 +17,7 @@ public enum BeneficiaryRelationships {
     MYSELF,
     SPOUSE,
     CHILDREN,
-    PARENT_GRANDPARENT,
+    PARENT_GRANPARENT,
     SIBLING_BROTHER_SISTER,
     RELATIVE_UNCLE_AUNTIE_COUSIN,
     FRIEND,

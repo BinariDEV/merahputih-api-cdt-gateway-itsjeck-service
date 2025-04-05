@@ -1,3 +1,14 @@
+# JVM memory settings
+jvm:
+  initial-heap-size: 256m
+  max-heap-size: 512m
+
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+  shutdown: graceful
+
 spring:
   application:
     name: api-cdt-gateway-itsjeck-service
@@ -5,16 +16,53 @@ spring:
     virtual:
       enabled: true
   thread-executor: virtual
+  config:
+    use-legacy-processing: true
+  jmx:
+    enabled: true
   data:
     mongodb:
       uri: mongodb://mongodb:27017/config_itsjeck
+  kafka:
+    bootstrap-servers: kafka:9092
+    consumer:
+      group-id: core-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    admin:
+      auto-create-topics: true
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
 
 ---
 management:
+  server:
+    port: 7180
   endpoints:
     web:
       exposure:
-        include: prometheus
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      show-details: ALWAYS
   metrics:
     tags:
       application: api-cdt-gateway-itsjeck-service
@@ -23,15 +71,18 @@ management:
         http:
           server:
             requests: 'true'
-    export:
-      otlp:
-        enabled: true
-        url: http://localhost:4318/v1/metrics
+  tracing:
+    sampling:
+      probability: 1.0
+  observations:
+    key-values:
+      application: api-cdt-gateway-itsjeck-service
 
 logging:
   pattern:
-    level: "trace_id=%mdc{trace_id} span_id=%mdc{span_id} trace_flags=%mdc{trace_flags} %p"
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
   level:
+    root: WARN
     agus.ramdan.cdt.gateway.itsjeck: DEBUG
     agus.ramdan.cdt.base: DEBUG
 
