@@ -5,12 +5,18 @@ import agus.ramdan.base.exception.XxxException;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceRequestDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceResponseDTO;
 import agus.ramdan.cdt.gateway.itsjeck.config.PaymentGatewayConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.val;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+
+import java.util.Map;
 
 @Service
 @Log4j2
@@ -19,37 +25,62 @@ public class TransferService {
     private final RestClient restClient;
     private final PaymentGatewayConfig paymentGatewayConfig;
     private final TransferMapper localTransferMapper;
-    public TransferBalanceResponseDTO transferCreate(TransferBalanceRequestDTO requestDTO) {
+    private final ObjectMapper objectMapper;
+    public TransferBalanceResponseDTO transferCreate(TransferBalanceRequestDTO requestDTO) throws JsonProcessingException {
         TransferRequest serviceRequest = localTransferMapper.mapToTransferRequestDTO(requestDTO);
-        ResponseEntity<TransferResponse> response = restClient
+        String url = paymentGatewayConfig.getBaseUrl()+paymentGatewayConfig.getLocalTransfer().getPath();
+        String bodyRequest = objectMapper.writeValueAsString(serviceRequest);
+        log.info("Request transferCreate: {}", bodyRequest);
+        val responseSpec = restClient
                 .post()
-                .uri(paymentGatewayConfig.getLocalTransfer().getPath())
+                .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(serviceRequest).retrieve()
-                .toEntity(TransferResponse.class);
-        if (response.getStatusCode().isError()){
-            log.error("Error transferCreate: {}", response);
-            Errors err = new Errors("Error transferCreate", response.getBody());
-            throw new XxxException("Error transferCreate",response.getStatusCode().value(),null,null, err);
-        }
-        TransferResponse serviceResponse = response.getBody();
+                .body(bodyRequest).retrieve();
+        TransferResponse serviceResponse = responseSpec
+                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                    Errors err = new Errors("Error 4xx transferCreate", res.getBody());
+                    throw new XxxException("Error transferCreate",res.getStatusCode().value(),null,null, err);
+                })
+                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                    Errors err = new Errors("Error 5xx transferCreate", res.getBody());
+                    throw new XxxException("Error transferCreate",res.getStatusCode().value(),null,null, err);
+                })
+                .body(TransferResponse.class);
         if (serviceResponse == null) {
-            log.error("Error transferCreate: {}", response);
+            log.error("Error transferCreate: response body is null");
             throw new XxxException("Error transferCreate : response body is null", 500);
         }
+        val responseDTO = localTransferMapper.mapToTransferBalanceResponseDTO(serviceResponse);
+        /**
+         * List of status transaction:
+         * 1 = On Process
+         * 2 = Success
+         * 4 = Failed
+         * 5 = Reverse
+         */
+        responseDTO.setStatus("1");
         Integer transactionId = serviceResponse.getData().getId();
-        response = restClient
-                .post()
-                .uri(paymentGatewayConfig.getLocalTransfer().getPath()+"/"+transactionId+"/confirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(serviceRequest).retrieve()
-                .toEntity(TransferResponse.class);
-        if (response.getStatusCode().isError()){
-            log.error("Error transfer Confirm: {}", response);
-            Errors err = new Errors("Error Transfer Confirm", response.getBody());
-            throw new XxxException("Error transferCreate",response.getStatusCode().value(),null,null, err);
+        try {
+            Map response = restClient
+                    .post()
+                    .uri(url+"/"+transactionId+"/confirm")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(serviceRequest)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                        Errors err = new Errors("Error 4xx confirm", res.getBody());
+                        throw new XxxException("Error confirm",res.getStatusCode().value(),null,null, err);
+                    })
+                    .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
+                        Errors err = new Errors("Error 5xx confirm", res.getBody());
+                        throw new XxxException("Error confirm",res.getStatusCode().value(),null,null, err);
+                    })
+                    .body(Map.class);
+            responseDTO.setStatus("2");
+        } catch (XxxException e) {
+
         }
-        return localTransferMapper.mapToTransferBalanceResponseDTO(serviceResponse);
+        return responseDTO;
     }
 
     public TransferBalanceResponseDTO getTransferByReferenceId(String referenceId) {

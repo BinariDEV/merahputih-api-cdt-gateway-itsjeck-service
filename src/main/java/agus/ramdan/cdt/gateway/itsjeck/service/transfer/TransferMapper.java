@@ -3,19 +3,15 @@ package agus.ramdan.cdt.gateway.itsjeck.service.transfer;
 import agus.ramdan.cdt.base.dto.gateway.TransferServiceCode;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceRequestDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceResponseDTO;
-import agus.ramdan.cdt.gateway.itsjeck.service.bank.BankCodeService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Mapper(componentModel = "spring")
 public abstract class TransferMapper {
-    @Autowired
-    private BankCodeService bankCodeService;
 
     @Named("formatAmount")
     public String formatAmount(BigDecimal amount) {
@@ -31,15 +27,11 @@ public abstract class TransferMapper {
         }
         return TransferServiceCode.SMART_ROUTE;
     }
-    @Named("mapToPayerBankCode")
-    public Integer mapToPayerBankCode(String bankCode) {
-        return bankCodeService.getPayerBankCode(bankCode);
-    }
 
     @Mapping(target = "referenceId", source = "transactionNo")
 //    @Mapping(target = "callbackUrl", source = "callbackUrl")
     //@Mapping(target = "balanceId")
-    @Mapping(target = "payerId", source = "destinationBankCode", qualifiedByName = "mapToPayerBankCode")
+    @Mapping(target = "payerId", source = "bankPayerId")
     @Mapping(target = "mode", constant = "DESTINATION")
     @Mapping(target = "sender.firstname", source = "destinationAccountFirstname")
     @Mapping(target = "sender.lastname", source = "destinationAccountLastname")

@@ -22,11 +22,12 @@ spring:
     enabled: true
   data:
     mongodb:
-      uri: mongodb://mongodb:27017/config_itsjeck
+      uri: mongodb://mongodb:27017/gateway_itsjeck
+
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
-      group-id: core-consumer-group
+      group-id: core-gateway-itsjeck-group
       auto-offset-reset: earliest
       enable-auto-commit: true
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -88,6 +89,6 @@ logging:
 
 payment-gateway:
   base-url: https://api.disbursement.transfez.com/api/v1
-  api-key : rahasia
+  api-key: rahasia
   local-transfer:
     path: /transactions

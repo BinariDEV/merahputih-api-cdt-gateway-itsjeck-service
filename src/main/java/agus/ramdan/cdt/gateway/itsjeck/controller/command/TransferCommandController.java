@@ -3,6 +3,7 @@ package agus.ramdan.cdt.gateway.itsjeck.controller.command;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceRequestDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceResponseDTO;
 import agus.ramdan.cdt.gateway.itsjeck.service.transfer.TransferService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +22,7 @@ public class TransferCommandController {
     @PostMapping("")
     public ResponseEntity<TransferBalanceResponseDTO> create(
             @RequestBody TransferBalanceRequestDTO dto,
-            @RequestHeader HttpHeaders headers) {
+            @RequestHeader HttpHeaders headers) throws JsonProcessingException {
         log.info("create transfer");
         return ResponseEntity.ok(service.transferCreate(dto));
     }

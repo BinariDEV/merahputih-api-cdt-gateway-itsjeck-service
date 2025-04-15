@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>agus.ramdan.cdt</groupId>
 	<artifactId>api-cdt-gateway-itsjeck-service</artifactId>
-	<version>21.3.4.4.0.20250402</version>
+	<version>21.3.4.4.0.20250403</version>
 	<name>api-cdt-gateway-itsjeck-service</name>
 	<description>Gateway Itsjeck</description>
 	<url/>
@@ -98,9 +98,9 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-docker-compose</artifactId>
-<!--			<scope>provided</scope>-->
-			<scope>runtime</scope>
-			<optional>true</optional>
+			<scope>provided</scope>
+<!--			<scope>runtime</scope>-->
+<!--			<optional>true</optional>-->
 		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -111,8 +111,7 @@
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
-
-		<!--		<dependency>-->
+<!--		<dependency>-->
 <!--			<groupId>io.micrometer</groupId>-->
 <!--			<artifactId>micrometer-tracing</artifactId>-->
 <!--			<version>1.4.4</version>-->
@@ -156,7 +155,7 @@
 		<dependency>
 			<groupId>agus.ramdan.cdt</groupId>
 			<artifactId>api-cdt-core-service</artifactId>
-			<version>21.3.4.4.0.20250330</version>
+			<version>21.3.4.4.0.20250405</version>
 			<classifier>client</classifier>
 			<exclusions>
 				<exclusion>
