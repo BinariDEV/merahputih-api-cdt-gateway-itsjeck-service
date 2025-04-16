@@ -2,6 +2,7 @@ package agus.ramdan.cdt.gateway.itsjeck.service.transfer;
 
 import agus.ramdan.base.exception.Errors;
 import agus.ramdan.base.exception.XxxException;
+import agus.ramdan.cdt.base.dto.GatewayCallbackDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceRequestDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceResponseDTO;
 import agus.ramdan.cdt.gateway.itsjeck.config.PaymentGatewayConfig;
@@ -13,9 +14,11 @@ import lombok.val;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -26,9 +29,12 @@ public class TransferService {
     private final PaymentGatewayConfig paymentGatewayConfig;
     private final TransferMapper localTransferMapper;
     private final ObjectMapper objectMapper;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
     public TransferBalanceResponseDTO transferCreate(TransferBalanceRequestDTO requestDTO) throws JsonProcessingException {
         TransferRequest serviceRequest = localTransferMapper.mapToTransferRequestDTO(requestDTO);
         String url = paymentGatewayConfig.getBaseUrl()+paymentGatewayConfig.getLocalTransfer().getPath();
+        serviceRequest.setCallbackUrl(paymentGatewayConfig.getCallbackEndpoint()+"/"+serviceRequest.getReferenceId());
         String bodyRequest = objectMapper.writeValueAsString(serviceRequest);
         log.info("Request transferCreate: {}", bodyRequest);
         val responseSpec = restClient
@@ -95,5 +101,21 @@ public class TransferService {
             throw new XxxException("Error Get Transfer By Reference ID",response.getStatusCode().value(),null,null, err);
         }
         return localTransferMapper.mapToTransferBalanceResponseDTO(response.getBody());
+    }
+
+    public void sendGatewayCallbackDTO(GatewayCallbackDTO event) {
+        kafkaTemplate.send("gateway-callback-topic", event);
+    }
+
+    public void callback(String referenceId, Map<String, Object> requestDTO) {
+        log.info("callback referenceId: {}", referenceId);
+        HashMap<String, Object> map = new HashMap<>(requestDTO);
+        map.put("transaction_no", referenceId);
+        map.put("status", "1");
+        sendGatewayCallbackDTO(GatewayCallbackDTO.builder()
+                .gatewayCode("ITSJECK")
+                .timestamp(System.currentTimeMillis())
+                .data(map)
+                .build());
     }
 }

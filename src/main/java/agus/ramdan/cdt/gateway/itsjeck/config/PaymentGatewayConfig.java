@@ -12,12 +12,10 @@ import org.springframework.context.annotation.Configuration;
 public class PaymentGatewayConfig {
     private String baseUrl;
     private String apiKey;
+    //PAYMENT_GATEWAY_CALLBACK_ENDPOINT
+    private String callbackEndpoint;
 
     private ApiUrlConfig localTransfer;
-
-//    private String merchantId;
-//    private String transactionKey;
-//    private ServiceConfig service;
 
     @Getter
     @Setter
@@ -39,7 +37,7 @@ public class PaymentGatewayConfig {
          * 0 = Transfer Online
          * 1 = BI Fast Transfer
          */
-        private String transferType = "0";
+        private String transferType = "1";
     }
 }
 
