@@ -21,11 +21,11 @@ public abstract class TransferMapper {
         return amount.setScale(2, BigDecimal.ROUND_DOWN).toPlainString(); // 2 desimal, tanpa koma
     }
     @Named("mapToTransferServiceCode")
-    public TransferServiceCode mapToTransferServiceCode(String transferServiceCode) {
-        if (Objects.equals(transferServiceCode, "1")) {
-            return TransferServiceCode.BI_FAST;
-        }
-        return TransferServiceCode.SMART_ROUTE;
+    public Integer mapToTransferServiceCode(String transferServiceCode) {
+//        if (Objects.equals(transferServiceCode, "0")) {
+//            return TransferServiceCode..getValue();
+//        }
+        return TransferServiceCode.BI_FAST.getValue();
     }
 
     @Mapping(target = "referenceId", source = "transactionNo")

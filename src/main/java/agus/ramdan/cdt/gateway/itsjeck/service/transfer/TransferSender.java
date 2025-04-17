@@ -17,5 +17,5 @@ public class TransferSender {
     @JsonProperty("country_iso_code")
     private String countryIsoCode;
     @JsonProperty("transfer_service_code")
-    private TransferServiceCode transferServiceCode;
+    private Integer transferServiceCode;
 }
