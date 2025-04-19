@@ -1,7 +1,6 @@
 package agus.ramdan.cdt.gateway.itsjeck.service.transfer;
 
 
-import agus.ramdan.cdt.base.dto.gateway.TransferServiceCode;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;

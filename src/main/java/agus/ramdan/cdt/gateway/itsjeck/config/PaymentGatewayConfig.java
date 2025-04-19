@@ -15,7 +15,7 @@ public class PaymentGatewayConfig {
     //PAYMENT_GATEWAY_CALLBACK_ENDPOINT
     private String callbackEndpoint;
 
-    private ApiUrlConfig localTransfer;
+    private LocalTransferBalanceConfig localTransfer;
 
     @Getter
     @Setter
@@ -27,6 +27,12 @@ public class PaymentGatewayConfig {
     @Setter
     public static class ApiUrlConfig {
         private String path;
+    }
+    @Getter
+    @Setter
+    public static class LocalTransferBalanceConfig {
+        private String path;
+        private Integer balanceId;
     }
 
     @Getter

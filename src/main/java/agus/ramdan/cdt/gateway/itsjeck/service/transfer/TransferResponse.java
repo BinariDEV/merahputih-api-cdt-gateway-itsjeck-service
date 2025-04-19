@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class TransferResponse {
 
     @JsonProperty("status")
     private String status;
-    private String message;
+    private Object message;
 
     @JsonProperty("data")
     private LocalTransferData data;
@@ -39,13 +40,13 @@ public class TransferResponse {
 
         @JsonProperty("payer_id")
         @Schema(description = "Index number of destination bank")
-        private String payerId;
+        private Integer payerId;
 
         private QuotationMode mode;
-        private TransferSender sender;
-        private TransferSource source;
-        private TransferDestination destination;
-        private TransferBeneficiary beneficiary;
+        private Map<String,Object> sender;
+        private Map<String,Object> source;
+        private Map<String,Object> destination;
+        private Map<String,Object> beneficiary;
         private String notes;
         /**
          * "created_at": "2023-03-03T16:10:49.812+07:00",

@@ -24,7 +24,7 @@ public class TransferRequest {
 
     @JsonProperty("payer_id")
     @Schema(description = "Index number of destination bank")
-    private String payerId;
+    private Integer payerId;
 
     private QuotationMode mode;
     private TransferSender sender;
@@ -33,5 +33,4 @@ public class TransferRequest {
     private TransferBeneficiary beneficiary;
     private ComplianceInfo compliance;
     private String notes;
-
 }

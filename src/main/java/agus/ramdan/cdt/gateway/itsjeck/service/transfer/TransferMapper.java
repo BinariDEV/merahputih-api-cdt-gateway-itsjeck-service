@@ -8,7 +8,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 @Mapper(componentModel = "spring")
 public abstract class TransferMapper {
@@ -20,17 +19,18 @@ public abstract class TransferMapper {
         }
         return amount.setScale(2, BigDecimal.ROUND_DOWN).toPlainString(); // 2 desimal, tanpa koma
     }
+
     @Named("mapToTransferServiceCode")
     public Integer mapToTransferServiceCode(String transferServiceCode) {
-//        if (Objects.equals(transferServiceCode, "0")) {
-//            return TransferServiceCode..getValue();
-//        }
-        return TransferServiceCode.BI_FAST.getValue();
+        return switch (transferServiceCode){
+            case "2" -> TransferServiceCode.SKN.getValue();
+            case "3" -> TransferServiceCode.RTGS.getValue();
+            case "4" -> TransferServiceCode.SMART_ROUTE.getValue();
+            default -> TransferServiceCode.BI_FAST.getValue();
+        };
     }
 
     @Mapping(target = "referenceId", source = "transactionNo")
-//    @Mapping(target = "callbackUrl", source = "callbackUrl")
-    //@Mapping(target = "balanceId")
     @Mapping(target = "payerId", source = "bankPayerId")
     @Mapping(target = "mode", constant = "DESTINATION")
     @Mapping(target = "sender.firstname", source = "destinationAccountFirstname")
@@ -55,19 +55,8 @@ public abstract class TransferMapper {
 
     @Mapping(target = "transactionId", source = "data.id")
     @Mapping(target = "transactionNo", source = "data.referenceId")
-//    @Mapping(target = "transactionDate", source = "data.createdAt")
-//    @Mapping(target = "transactionStatus", source = "status")
-//    @Mapping(target = "transactionAmount", source = "data.amount", qualifiedByName = "formatAmount")
     @Mapping(target = "transactionFee", source = "data.fee", qualifiedByName = "formatAmount")
-//    @Mapping(target = "transactionRate", source = "data.rate", qualifiedByName = "formatAmount")
-//    @Mapping(target = "transactionType", constant = "TRANSFER")
-//    @Mapping(target = "transactionCurrency", source = "data.source.currency")
-//    @Mapping(target = "transactionDestinationAccount", source = "data.destination.account")
-//    @Mapping(target = "transactionDestinationAccountName", source = "data.beneficiary.firstname")
-//    @Mapping(target = "transactionDestinationBank", source = "data.destination.bank")
-//    @Mapping(target = "transactionDestinationBankCode", source = "data.destination.bankCode")
-    //@Mapping(target = "state", source = "state")
     @Mapping(target = "description", source = "data.notes")
-    @Mapping(target = "message", source = "message")
+    @Mapping(target = "message", source = "data.errorMessage")
     public abstract TransferBalanceResponseDTO mapToTransferBalanceResponseDTO(TransferResponse response);
 }
