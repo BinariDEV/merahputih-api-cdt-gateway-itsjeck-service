@@ -1,7 +1,7 @@
 package agus.ramdan.cdt.gateway.itsjeck.service.transfer;
 
+import agus.ramdan.base.dto.GatewayCallbackDTO;
 import agus.ramdan.base.exception.XxxException;
-import agus.ramdan.cdt.base.dto.GatewayCallbackDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceRequestDTO;
 import agus.ramdan.cdt.core.gateway.controller.dto.transfer.TransferBalanceResponseDTO;
 import agus.ramdan.cdt.gateway.itsjeck.config.PaymentGatewayConfig;
@@ -73,17 +73,15 @@ public class TransferService {
     public void callback(String referenceId, Map<String, Object> requestDTO) {
         log.info("callback referenceId: {}", referenceId);
         HashMap<String, Object> map = new HashMap<>(requestDTO);
-        map.put("transaction_no", referenceId);
-        String status = "1";
-        if (requestDTO.get("body") instanceof Map) {
-            Map<String, Object> body = (Map<String, Object>) requestDTO.get("body");
-            if (body.get("status") instanceof String) {
-                status = (String) body.get("status");
-            }
+        String state = "1";
+        if (requestDTO.get("state") instanceof String) {
+            state = (String) requestDTO.get("state");
         }
-        map.put("status", mapStatus(status));
         sendGatewayCallbackDTO(GatewayCallbackDTO.builder()
                 .gatewayCode("ITSJECK")
+                .transactionNo(referenceId)
+                .status(mapStatus(state))
+                .message(requestDTO.get("error_message") != null ? requestDTO.get("error_message").toString() : "")
                 .timestamp(System.currentTimeMillis())
                 .data(map)
                 .build());

@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>agus.ramdan.cdt</groupId>
 	<artifactId>api-cdt-gateway-itsjeck-service</artifactId>
-	<version>21.3.4.4.0.20250406</version>
+	<version>21.3.4.4.0.20250407</version>
 	<name>api-cdt-gateway-itsjeck-service</name>
 	<description>Gateway Itsjeck</description>
 	<url/>
@@ -144,7 +144,7 @@
 		<dependency>
 			<groupId>agus.ramdan.cdt</groupId>
 			<artifactId>api-cdt-core-service</artifactId>
-			<version>21.3.4.4.0.20250405</version>
+			<version>21.3.4.4.0.20250407</version>
 			<classifier>client</classifier>
 			<exclusions>
 				<exclusion>
